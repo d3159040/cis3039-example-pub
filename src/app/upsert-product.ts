@@ -1,8 +1,10 @@
 import { Product, createProduct, CreateProductParams } from '../domain/product';
 import { ProductRepo } from '../domain/product-repo';
+import { ProductEventPublisher } from './product-event-publisher';
 
 export type UpsertProductDeps = {
   productRepo: ProductRepo;
+  productEventPublisher: ProductEventPublisher;
   now: () => Date;
 };
 
@@ -29,7 +31,7 @@ export async function upsertProduct(
   deps: UpsertProductDeps,
   command: UpsertProductCommand
 ): Promise<UpsertProductResult> {
-  const { productRepo, now } = deps;
+  const { productRepo, productEventPublisher, now } = deps;
 
   try {
     // Validate and create the product entity
@@ -40,6 +42,18 @@ export async function upsertProduct(
 
     // Save (upsert) the product
     const savedProduct = await productRepo.save(product);
+
+    // NOTE: this is the danger zone where a crash will lead to the system being
+    //  in an inconsistent state; the Outbox Pattern could help here.
+
+    // Publish the product updated event
+    await productEventPublisher.publishProductUpdated({
+      productId: savedProduct.id,
+      name: savedProduct.name,
+      pricePence: savedProduct.pricePence,
+      description: savedProduct.description,
+      updatedAt: savedProduct.updatedAt,
+    });
 
     return { success: true, data: savedProduct };
   } catch (error) {
