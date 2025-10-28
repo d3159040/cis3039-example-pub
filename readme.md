@@ -63,8 +63,8 @@ az policy assignment list \
 
 ```bash
 az group create \
-  --name <your-resource-group> \
-  --location <permitted-location>
+  --name shopping-dev-cs47-rg \
+  --location germanywestcentral
 ```
 
 Remember to follow our naming convention, e.g. shopping-lab-ab47-rg
@@ -73,9 +73,9 @@ Remember to follow our naming convention, e.g. shopping-lab-ab47-rg
 
 ```bash
 az eventgrid topic create \
-  --name <your-topic-name> \
-  --resource-group <your-resource-group> \
-  --location <permitted-location> \
+  --name shopping-dev-cs47-products-topic \
+  --resource-group shopping-dev-cs47-rg \
+  --location germanywestcentral \
   --input-schema CloudEventSchemaV1_0 \
   --sku basic
 ```
@@ -88,8 +88,8 @@ For topic name, include an extra part for event source, e.g. shopping-lab-ab47-p
 
 ```bash
 az eventgrid topic show \
-  --name <your-topic-name> \
-  --resource-group <your-resource-group> \
+  --name shopping-dev-cs47-products-topic \
+  --resource-group shopping-dev-cs47-rg \
   --query "endpoint" \
   -o tsv
 ```
@@ -100,8 +100,8 @@ az eventgrid topic show \
 
 ```bash
 az eventgrid topic key list \
-  --name <your-topic-name> \
-  --resource-group <your-resource-group> \
+  --name shopping-dev-cs47-products-topic \
+  --resource-group shopping-dev-cs47-rg \
   --query "key1" \
   -o tsv
 ```
